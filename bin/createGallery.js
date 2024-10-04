@@ -26,21 +26,31 @@ function processGallery({ inputSrc, outputSrc }) {
         "alt": "{{item.alt}}"
     */
 
-    const galleryItems = allFiles.map(function (file, index) {
+    const galleryItems = allFiles.reduce((list, file, index) => {
       console.log(`    👀 Checking file: ${file}`);
 
       const parts = path.parse(file);
+
+      if (!parts.ext || parts.ext === '') {
+        console.log(`     🚽 Get outta here ${file} you don't belong!`);
+        return list;
+      }
+
       // this only works because the names are consistent
       // so don't copy this anywhere else, it's fragile
       const nameParts = parts.name.split('-');
-      const id = nameParts[nameParts.length - 1]
 
-      return {
+      // drop the numerical id from the alt
+      const id = nameParts.pop();
+
+      list.push({
         id,
         src: file,
         alt: nameParts.join(' '),
-      };
-    });
+      });
+
+      return list;
+    }, []);
 
     console.log(`   💯 ${galleryItems.length} gallery items found!`);
 
