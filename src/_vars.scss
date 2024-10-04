@@ -77,3 +77,22 @@ $on-desk:          1100px;
 }
 
 
+/**
+ * Wrapper
+ */
+%wrapper {
+    @extend %clearfix;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: $spacing-unit;
+    padding-left: $spacing-unit;
+    max-width: $content-width;
+
+    @include media-query($on-laptop) {
+        padding-right: math.div($spacing-unit, 2);
+        padding-left: math.div($spacing-unit, 2);
+    }
+}

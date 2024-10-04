@@ -1,1 +1,22 @@
+@use 'sass:math';
 
+@forward './_vars.scss';
+@use './_vars.scss' as *;
+
+.app-content {
+    padding: $spacing-unit 0;
+    background: $background-color;
+}
+
+.app-content--alt {
+    padding: $spacing-unit 0;
+    background: $alt-background-color;
+}
+
+.app-content__wrap {
+    @extend %wrapper;
+}
+
+.app-content__wrap--half {
+    max-width: math.div($content-width, 2);
+}
