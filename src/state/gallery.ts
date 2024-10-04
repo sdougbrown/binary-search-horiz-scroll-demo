@@ -10,23 +10,43 @@ type GalleryState = {
   canScrollRight: boolean;
 };
 
+type Boundary = [number, number, number];
+
+function createState(): GalleryState {
+  return {
+    width: 0,
+    widths: [],
+    offsets: [],
+    position: 0,
+    loadPosition: null,
+    canScrollLeft: false,
+    canScrollRight: true,
+  };
+}
+
 // the intent is to convert this to a state manager.
 // for now it's just a POJO.
-export const state: GalleryState = {
-  width: 0,
-  widths: [],
-  offsets: [],
-  position: 0,
-  loadPosition: null,
-  canScrollLeft: false,
-  canScrollRight: true,
-};
+let currentState: GalleryState = createState();
+
+export function replaceState(tmpState?: GalleryState) {
+  if (!tmpState) {
+    currentState = createState();
+    return;
+  }
+
+  currentState = tmpState;
+}
+
+export function getState(): GalleryState {
+  return currentState;
+}
 
 export function evaluateGalleryButtons() {
-  var visible = findVisibleItems();
-  var pageSize = visible.length - 1;
-  var maxIndex = state.offsets.length - 1;
-  var hasStateChanged = false;
+  let state = getState();
+  let visible = findVisibleItems();
+  let pageSize = visible.length - 1;
+  let maxIndex = state.offsets.length - 1;
+  let hasStateChanged = false;
 
   if (visible[0] === 0) {
     if (state.canScrollLeft) {
@@ -58,25 +78,27 @@ export function evaluateGalleryButtons() {
   }
 }
 
-export function getVisibleWindow() {
+export function getVisibleWindow(): Boundary {
+  let state = getState();
   return [state.position, state.position + state.width, state.width];
 };
 
-export function isFullyVisible(limits, bounds) {
+export function isFullyVisible(limits: Boundary, bounds: Boundary) {
   return limits[0] < bounds[0] && limits[1] > bounds[1];
 }
 
-export function isPartiallyVisibleLeft(limits, bounds) {
-  return Math.max(0, limits[0] - bounds[3]) < bounds[0] && limits[1] > bounds[1];
+export function isPartiallyVisibleLeft(limits: Boundary, bounds: Boundary) {
+  return Math.max(0, limits[0] - bounds[2]) < bounds[0] && limits[1] > bounds[1];
 }
 
-export function isPartiallyVisibleRight(limits, bounds) {
+export function isPartiallyVisibleRight(limits: Boundary, bounds: Boundary) {
   var maxWidth = limits[0] + limits[1];
 
-  return Math.min(limits[1] + bounds[3], maxWidth) > bounds[1] && limits[0] < bounds[0];
+  return Math.min(limits[1] + bounds[2], maxWidth) > bounds[1] && limits[0] < bounds[0];
 }
 
 export function findVisibleItems() {
+  let state = getState();
   let offsets = state.offsets;
   let widths = state.widths;
   let limits = getVisibleWindow();
@@ -90,7 +112,7 @@ export function findVisibleItems() {
 
   while (start <= end) {
     let middle = Math.floor((start + end) / 2);
-    let bounds = [offsets[middle], offsets[middle] + widths[middle], widths[middle]];
+    let bounds: Boundary = [offsets[middle], offsets[middle] + widths[middle], widths[middle]];
 
     let isFull = isFullyVisible(limits, bounds);
     let isPartialLeft = !isFull && isPartiallyVisibleLeft(limits, bounds);
