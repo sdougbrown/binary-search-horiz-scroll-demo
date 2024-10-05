@@ -62,6 +62,8 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
       set({
         ...get(),
         items,
+        widths: Array(items.length).fill(void 0),
+        offsets: Array(items.length).fill(void 0),
       });
     } catch (e) {
       log('💥 you did something wrong: ', e);
@@ -71,14 +73,7 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
     return findVisibleItems(get() as GalleryState);
   },
   updateNavigation: () => set(produce(state => evaluateGalleryButtons(state as GalleryState))),
-
-  // the below setters are unique and kind of an anti-pattern.
-  // intentionally modifying inline rather than doing a shallow clone
-  // because it does not have an effect on render cycles etc and we don't
-  // want it to! this will fire a lot on page load and through scrolling
-  // we don't want those cycles to fire a re-render, but the underlying state
-  // will effect the evaluations done above
-  setLoadPosition: (position: number) => set(
+  setLoadPosition: (position: number) => set(produce(
     state => {
       log('setting load position', position);
       state.loadPosition = position;
@@ -90,20 +85,26 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
       });
       return state;
     }
-  ),
-  setPosition: (position: number) => set(
+  )),
+  setPosition: (position: number) => set(produce(
     state => {
       log('setting position', position);
       state.position = position;
       return state;
     }
-  ),
-  setWidth: (width: number) => set(state => {
+  )),
+  setWidth: (width: number) => set(produce(state => {
       log('setting width', width);
       state.width = width;
       return state;
     }
-  ),
+  )),
+  // the below setters are unique and kind of an anti-pattern.
+  // intentionally modifying inline rather than doing a shallow clone
+  // because it does not have an effect on render cycles etc and we don't
+  // want it to! this will fire a lot on page load and through scrolling
+  // we don't want those cycles to fire a re-render, but the underlying state
+  // will effect the evaluations done above
   setItem: (width: number, x: number, index: number) => set(
     state => {
       log('setting item', index, width, x);

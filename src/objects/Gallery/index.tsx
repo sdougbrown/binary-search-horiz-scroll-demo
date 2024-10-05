@@ -78,10 +78,26 @@ function Gallery() {
     }
   }, [items]);
 
-  const onScroll = useCallback(debounce((e) => {
-    log(e, scroller.current);
-    setPosition(e.target.scrollLeft);
+  useEffect(() => {
+    if (!scroller.current) {
+      return;
+    }
+    setWidth(scroller.current.offsetWidth);
+    setPosition(scroller.current.scrollLeft);
 
+    // check the load position after a few ms because some browsers like to reset it
+    setTimeout(() => {
+      if (useGalleryStore.getState().loadPosition === null) {
+        setLoadPosition(scroller.current.scrollLeft);
+      }
+    }, 100);
+  }, [scroller.current]);
+
+  const onScroll = useCallback(debounce((e) => {
+    if (useGalleryStore.getState().loadPosition === null) {
+      setLoadPosition(scroller.current.scrollLeft);
+    }
+    setPosition(e.target.scrollLeft);
     updateNavigation();
   }, 64), [setPosition, updateNavigation]);
 
