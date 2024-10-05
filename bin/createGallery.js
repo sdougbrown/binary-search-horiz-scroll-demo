@@ -8,7 +8,7 @@ const OUTPUT_FILE = `gallery.json`;
 const GALLERY_INPUT = `${__dirname}/public/gallery`;
 const GALLERY_OUTPUT = `${__dirname}/public/${OUTPUT_FILE}`;
 
-function processGallery({ inputSrc, outputSrc }) {
+function processGallery({ inputSrc, itemPath, outputSrc }) {
   fs.readdir(inputSrc, async function (err, allFiles) {
     if (err) {
       console.error(
@@ -45,7 +45,7 @@ function processGallery({ inputSrc, outputSrc }) {
 
       list.push({
         id,
-        src: file,
+        src: path.join(itemPath, file),
         alt: nameParts.join(' '),
       });
 
@@ -73,6 +73,7 @@ try {
   processGallery({
     inputSrc: GALLERY_INPUT,
     outputSrc: GALLERY_OUTPUT,
+    itemPath: '/gallery/',
   });
 } catch (e) {
   console.error('💥 The whole thing blew up!', e);
