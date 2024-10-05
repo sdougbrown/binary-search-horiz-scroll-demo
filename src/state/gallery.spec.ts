@@ -32,6 +32,15 @@ const mockGalleryOffsets = mockGalleryWidths.map((width, i) => {
   return mockGalleryWidths[i - 1] + mockGallerySpacing ;
 });
 
+// @ts-expect-error yes I know this doesn't match the profile
+global.fetch = jest.fn(() => Promise.resolve({
+  json: () => Promise.resolve(mockGalleryWidths.map(w => ({
+    id: `${Math.floor(w * Math.random())}`,
+    src: `${w}.jpg`,
+    alt: `${w}`,
+  }))),
+}));
+
 describe('📀 mock data validity', () => {
   it('has matching lengths', () => {
     expect(mockGalleryWidths.length).toEqual(mockGalleryOffsets.length);
@@ -134,4 +143,30 @@ describe('🔎 binary search visibility algo', () => {
     // console.log(visible);
     expect(visible.length > 1).toBe(true);
   });
+});
+
+describe('🦴 fetching external json data', () => {
+  const { useGalleryStore } = galleryState;
+
+  beforeEach(async () => {
+    await useGalleryStore.getState().loadItems();
+  });
+
+  it('fetches the gallery data', async () => {
+    expect(global.fetch).toHaveBeenCalled();
+  });
+
+  it('gets valid data', () => {
+    const newState = useGalleryStore.getState();
+    expect(newState.items.length > 1).toBe(true);
+  });
+
+  it('populates offsets and widths', () => {
+    const newState = useGalleryStore.getState();
+
+    expect(newState.items.length).toEqual(mockGalleryWidths.length);
+    expect(newState.items.length).toEqual(newState.widths.length);
+    expect(newState.items.length).toEqual(newState.offsets.length);
+  });
+
 });
