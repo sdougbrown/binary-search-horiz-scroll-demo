@@ -2,10 +2,20 @@ import { create } from 'zustand';
 import { produce } from 'immer';
 import { log } from '../utils/log';
 
+// this is very project-specific obviously, don't copy this mess
+const GALLERY_JSON = '/gallery.json';
+
 export type Boundary = [number, number, number];
+
+export type GalleryItem = {
+  id: string;
+  src: string;
+  alt: string;
+};
 
 export type GalleryState = {
   width: number;
+  items: Array<GalleryItem>;
   widths: Array<number>;
   offsets: Array<number>;
   position: number;
@@ -16,7 +26,8 @@ export type GalleryState = {
 
 export type GalleryActions = {
   getVisibleItems: () => Array<number>;
-  setNavigation: () => void;
+  loadItems: () => Promise<void>;
+  updateNavigation: () => void;
   setLoadPosition: (p: number) => void;
   setPosition: (p: number) => void;
   setWidth: (w: number) => void;
@@ -28,6 +39,7 @@ export type GalleryStore = GalleryState & GalleryActions;
 export function createNewState(): GalleryState {
   return {
     width: 0,
+    items: [],
     widths: [],
     offsets: [],
     position: 0,
@@ -39,10 +51,26 @@ export function createNewState(): GalleryState {
 
 export const useGalleryStore = create<GalleryStore>((set, get) => ({
   ...createNewState(),
+  loadItems: async () => {
+    if (get().items.length > 1) {
+      return;
+    }
+    try {
+      const response = await fetch(GALLERY_JSON);
+      const items = await response.json();
+
+      set({
+        ...get(),
+        items,
+      });
+    } catch (e) {
+      log('💥 you did something wrong: ', e);
+    }
+  },
   getVisibleItems: () => {
     return findVisibleItems(get() as GalleryState);
   },
-  setNavigation: () => set(produce(state => evaluateGalleryButtons(state as GalleryState))),
+  updateNavigation: () => set(produce(state => evaluateGalleryButtons(state as GalleryState))),
 
   // the below setters are unique and kind of an anti-pattern.
   // intentionally modifying inline rather than doing a shallow clone
@@ -52,6 +80,7 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
   // will effect the evaluations done above
   setLoadPosition: (position: number) => set(
     state => {
+      log('setting load position', position);
       state.loadPosition = position;
       state.offsets.forEach((offset, i) => {
         if (isNaN(offset)) {
@@ -64,17 +93,20 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
   ),
   setPosition: (position: number) => set(
     state => {
+      log('setting position', position);
       state.position = position;
       return state;
     }
   ),
   setWidth: (width: number) => set(state => {
+      log('setting width', width);
       state.width = width;
       return state;
     }
   ),
   setItem: (width: number, x: number, index: number) => set(
     state => {
+      log('setting item', index, width, x);
       state.widths[index] = width;
       state.offsets[index] = x + (state.loadPosition || 0);
       return state;
@@ -210,4 +242,5 @@ export function findVisibleItems(state: GalleryState) {
   });
 };
 
+export default useGalleryStore;
 

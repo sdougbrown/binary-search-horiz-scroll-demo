@@ -25,7 +25,8 @@ $scrollbar-thumb: $alt-background-color;
     scrollbar-width: thin;
     scrollbar-color: $scrollbar-thumb $scrollbar-body;
 
-    & > .wrapper {
+    &__wrapper {
+        @extend %wrapper;
         padding-left: $spacing-half;
         padding-right: $spacing-half;
 
@@ -82,7 +83,8 @@ $scrollbar-thumb: $alt-background-color;
             }
         }
 
-        & > svg {
+        & > svg,
+        & > img {
             height: $spacing-unit * 1.5;
             width: $spacing-unit * 1.5;
             position: absolute;

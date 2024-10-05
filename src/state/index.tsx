@@ -1,1 +1,2 @@
-export * as galleryState from './gallery';
+export { useGalleryStore } from './gallery';
+
