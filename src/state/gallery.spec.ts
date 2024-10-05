@@ -44,46 +44,15 @@ describe('⚙️  initial gallery setup', () => {
   });
 
   it('has expected starting values', () => {
-    const initialState = galleryState.getState();
+    const initialState = galleryState.createNewState();
 
     expect(initialState.width).toBe(0);
     expect(initialState.position).toBe(0);
   });
 });
 
-describe('🔄 gallery state modification and reset', () => {
-  const initialState = galleryState.getState();
-
-  it('modifies easily, returns consistently', () => {
-    // modify some things
-    initialState.width = 1000;
-    initialState.position = 70;
-    initialState.loadPosition = 0;
-    initialState.widths.push(200);
-    initialState.widths.push(100);
-    initialState.widths.push(300);
-
-    const nextState = galleryState.getState();
-
-    //expect(nextState.width).toEqual(1000);
-    //expect(nextState.position).toEqual(70);
-    //expect(nextState.loadPosition).toEqual(0);
-    //expect(nextState.widths.length).toEqual(3);
-  });
-
-  it('resets predicibally', () => {
-    galleryState.replaceState();
-
-    const newState = galleryState.getState();
-
-    expect(newState).not.toBe(initialState);
-  });
-
-  galleryState.replaceState();
-});
-
 describe('🪟 visible window', () => {
-  const state = galleryState.getState();
+  const state = galleryState.createNewState();
 
   state.position = 100;
   state.width = 300;
@@ -91,8 +60,6 @@ describe('🪟 visible window', () => {
   it('should return the expected tuple', () => {
     expect(galleryState.getVisibleWindow(state)).toStrictEqual([100, 400, 300]);
   });
-
-  galleryState.replaceState();
 });
 
 describe('👀 visibility helpers', () => {
@@ -155,7 +122,7 @@ describe('👀 visibility helpers', () => {
 
 describe('🔎 binary search visibility algo', () => {
   const findVisibleItems = galleryState.findVisibleItems;
-  const state = galleryState.getState();
+  const state = galleryState.createNewState();
   state.width = 1000;
   state.position = 700;
   state.loadPosition = 0;
@@ -167,6 +134,4 @@ describe('🔎 binary search visibility algo', () => {
     // console.log(visible);
     expect(visible.length > 1).toBe(true);
   });
-
-  galleryState.replaceState();
 });

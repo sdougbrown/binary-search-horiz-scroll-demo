@@ -1,4 +1,8 @@
+import { create } from 'zustand';
+import { produce } from 'immer';
 import { log } from '../utils/log';
+
+export type Boundary = [number, number, number];
 
 export type GalleryState = {
   width: number;
@@ -10,9 +14,18 @@ export type GalleryState = {
   canScrollRight: boolean;
 };
 
-export type Boundary = [number, number, number];
+export type GalleryActions = {
+  getVisibleItems: () => Array<number>;
+  setNavigation: () => void;
+  setLoadPosition: (p: number) => void;
+  setPosition: (p: number) => void;
+  setWidth: (w: number) => void;
+  setItem: (w: number, x: number, i: number) => void;
+};
 
-function createState(): GalleryState {
+export type GalleryStore = GalleryState & GalleryActions;
+
+export function createNewState(): GalleryState {
   return {
     width: 0,
     widths: [],
@@ -24,55 +37,79 @@ function createState(): GalleryState {
   };
 }
 
-// the intent is to convert this to a state manager.
-// for now it's just a POJO.
-let currentState: GalleryState = createState();
+export const useGalleryStore = create<GalleryStore>((set, get) => ({
+  ...createNewState(),
+  getVisibleItems: () => {
+    return findVisibleItems(get() as GalleryState);
+  },
+  setNavigation: () => set(produce(state => evaluateGalleryButtons(state as GalleryState))),
 
-export function replaceState(tmpState?: GalleryState) {
-  if (!tmpState) {
-    currentState = createState();
-    return;
-  }
+  // the below setters are unique and kind of an anti-pattern.
+  // intentionally modifying inline rather than doing a shallow clone
+  // because it does not have an effect on render cycles etc and we don't
+  // want it to! this will fire a lot on page load and through scrolling
+  // we don't want those cycles to fire a re-render, but the underlying state
+  // will effect the evaluations done above
+  setLoadPosition: (position: number) => set(
+    state => {
+      state.loadPosition = position;
+      state.offsets.forEach((offset, i) => {
+        if (isNaN(offset)) {
+          return;
+        }
+        state.offsets[i] = offset + position;
+      });
+      return state;
+    }
+  ),
+  setPosition: (position: number) => set(
+    state => {
+      state.position = position;
+      return state;
+    }
+  ),
+  setWidth: (width: number) => set(state => {
+      state.width = width;
+      return state;
+    }
+  ),
+  setItem: (width: number, x: number, index: number) => set(
+    state => {
+      state.widths[index] = width;
+      state.offsets[index] = x + (state.loadPosition || 0);
+      return state;
+    }
+  ),
+}));
 
-  currentState = tmpState;
-}
-
-export function getState(): GalleryState {
-  return currentState;
-}
+export const getState = useGalleryStore.getState;
 
 export function evaluateGalleryButtons(state: GalleryState) {
   let visible = findVisibleItems(state);
   let pageSize = visible.length - 1;
   let maxIndex = state.offsets.length - 1;
-  let hasStateChanged = false;
 
   if (visible[0] === 0) {
     if (state.canScrollLeft) {
       state.canScrollLeft = false;
-      hasStateChanged = true;
     }
   } else {
     if (!state.canScrollLeft) {
       state.canScrollLeft = true;
-      hasStateChanged = true;
     }
   }
 
   if (visible[pageSize] === maxIndex) {
     if (state.canScrollRight) {
       state.canScrollRight = false;
-      hasStateChanged = true;
     }
   } else {
     if (!state.canScrollRight) {
       state.canScrollRight = true;
-      hasStateChanged = true;
     }
   }
-    // probably don't need to do anything here when converted to zustand
-    // previously, this would be where we triggered a re-draw or updated the dom etc
-  return hasStateChanged;
+
+  return state;
 }
 
 export function getVisibleWindow(state: GalleryState): Boundary {
