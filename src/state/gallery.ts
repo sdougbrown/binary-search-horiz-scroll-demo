@@ -1,6 +1,6 @@
 import { log } from '../utils/log';
 
-type GalleryState = {
+export type GalleryState = {
   width: number;
   widths: Array<number>;
   offsets: Array<number>;
@@ -10,7 +10,7 @@ type GalleryState = {
   canScrollRight: boolean;
 };
 
-type Boundary = [number, number, number];
+export type Boundary = [number, number, number];
 
 function createState(): GalleryState {
   return {
@@ -41,9 +41,8 @@ export function getState(): GalleryState {
   return currentState;
 }
 
-export function evaluateGalleryButtons() {
-  let state = getState();
-  let visible = findVisibleItems();
+export function evaluateGalleryButtons(state: GalleryState) {
+  let visible = findVisibleItems(state);
   let pageSize = visible.length - 1;
   let maxIndex = state.offsets.length - 1;
   let hasStateChanged = false;
@@ -71,15 +70,12 @@ export function evaluateGalleryButtons() {
       hasStateChanged = true;
     }
   }
-
-  if (hasStateChanged) {
     // probably don't need to do anything here when converted to zustand
     // previously, this would be where we triggered a re-draw or updated the dom etc
-  }
+  return hasStateChanged;
 }
 
-export function getVisibleWindow(): Boundary {
-  let state = getState();
+export function getVisibleWindow(state: GalleryState): Boundary {
   return [state.position, state.position + state.width, state.width];
 };
 
@@ -97,11 +93,10 @@ export function isPartiallyVisibleRight(limits: Boundary, bounds: Boundary) {
   return Math.min(limits[1] + bounds[2], maxWidth) > bounds[1] && limits[0] < bounds[0];
 }
 
-export function findVisibleItems() {
-  let state = getState();
+export function findVisibleItems(state: GalleryState) {
   let offsets = state.offsets;
   let widths = state.widths;
-  let limits = getVisibleWindow();
+  let limits = getVisibleWindow(state);
 
   let visible = [];
 
