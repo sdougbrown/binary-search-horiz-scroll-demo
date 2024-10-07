@@ -60,7 +60,6 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
       const items = await response.json();
 
       set({
-        ...get(),
         items,
         widths: Array(items.length).fill(void 0),
         offsets: Array(items.length).fill(void 0),
@@ -83,20 +82,17 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
         }
         state.offsets[i] = offset + position;
       });
-      return state;
     }
   )),
   setPosition: (position: number) => set(produce(
     state => {
       log('setting position', position);
       state.position = position;
-      return state;
     }
   )),
   setWidth: (width: number) => set(produce(state => {
       log('setting width', width);
       state.width = width;
-      return state;
     }
   )),
   // the below setters are unique and kind of an anti-pattern.
@@ -108,9 +104,16 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
   setItem: (width: number, x: number, index: number) => set(
     state => {
       log('setting item', index, width, x);
-      state.widths[index] = width;
-      state.offsets[index] = x + (state.loadPosition || 0);
-      return state;
+
+      const { widths, offsets } = state;
+
+      widths[index] = width;
+      offsets[index] = x + (state.loadPosition || 0);
+
+      return ({
+        offsets,
+        widths,
+      });
     }
   ),
 }));
