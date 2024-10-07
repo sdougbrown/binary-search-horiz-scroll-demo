@@ -154,13 +154,13 @@ export function isFullyVisible(limits: Boundary, bounds: Boundary) {
 }
 
 export function isPartiallyVisibleLeft(limits: Boundary, bounds: Boundary) {
-  return Math.max(0, limits[0] - bounds[2]) < bounds[0] && limits[1] > bounds[1];
+  return Math.max(0, limits[0] - bounds[2]) < bounds[0] && (limits[1] > bounds[1] || limits[2] < bounds[2]);
 }
 
 export function isPartiallyVisibleRight(limits: Boundary, bounds: Boundary) {
   var maxWidth = limits[0] + limits[1];
 
-  return Math.min(limits[1] + bounds[2], maxWidth) > bounds[1] && limits[0] < bounds[0];
+  return Math.min(limits[1] + bounds[2], maxWidth) > bounds[1] && (limits[0] < bounds[0] || limits[2] < bounds[2]);
 }
 
 export function findVisibleItems(state: GalleryState) {
@@ -185,10 +185,11 @@ export function findVisibleItems(state: GalleryState) {
 
     if (isFull || isPartialLeft || isPartialRight) {
       // found a visible position!
-      log('✅ Match found: ', middle);
+      log('✅ Match found: ', middle, isFull, isPartialLeft, isPartialRight);
 
       // now we just need to walk to find the start, starting left
-      if (isFullyVisible) {
+      if (isFull || limits[2] <= bounds[2]) {
+        log('📌 pushing initial match: ', middle);
         visible.push(middle);
       }
 
@@ -234,6 +235,12 @@ export function findVisibleItems(state: GalleryState) {
     } else {
       log('🔎 searching right: ', start, middle, end, limits[1], bounds);
       // searched too far right, go back and search left
+      if (start === end) {
+        // we probably skipped over a match, let's extend the search a bit
+        end = Math.max(offsets.length - 1, end + 2);
+        start = middle - 1;
+        continue;
+      }
       start = middle + 1;
     }
   }

@@ -24,13 +24,10 @@ const mockGalleryWidths = [
   200,
   300
 ];
-const mockGalleryOffsets = mockGalleryWidths.map((width, i) => {
-  if (i === 0) {
-    return 0;
-  }
-
-  return mockGalleryWidths[i - 1] + mockGallerySpacing ;
-});
+const mockGalleryOffsets = mockGalleryWidths.reduce((arr, width, i) => {
+  arr[i] = i === 0 ? 0 : arr[i - 1] + mockGalleryWidths[i - 1] + mockGallerySpacing;
+  return arr;
+}, []);
 
 // @ts-expect-error yes I know this doesn't match the profile
 global.fetch = jest.fn(() => Promise.resolve({
@@ -99,6 +96,9 @@ describe('👀 visibility helpers', () => {
     it('should identify values partially in view', () => {
       expect(isVisible(limits, [200, 500, 300])).toBe(true);
     });
+    it('should allow for double overlap on small screens', () => {
+      expect(isVisible([250, 550, 300], [200, 600, 400])).toBe(true);
+    });
     it('will false-positive values fully in view oops', () => {
       // want to change this
       expect(isVisible(limits, [400, 500, 100])).toBe(true);
@@ -116,6 +116,9 @@ describe('👀 visibility helpers', () => {
     it('should identify values partially in view', () => {
       expect(isVisible(limits, [800, 1100, 300])).toBe(true);
     });
+    it('should allow for double overlap on small screens', () => {
+      expect(isVisible([250, 550, 300], [200, 600, 400])).toBe(true);
+    });
     it('will false-positive values fully in view oops', () => {
       // want to change this
       expect(isVisible(limits, [400, 500, 100])).toBe(true);
@@ -132,16 +135,104 @@ describe('👀 visibility helpers', () => {
 describe('🔎 binary search visibility algo', () => {
   const findVisibleItems = galleryState.findVisibleItems;
   const state = galleryState.createNewState();
-  state.width = 1000;
-  state.position = 700;
+
   state.loadPosition = 0;
   state.offsets = [...mockGalleryOffsets];
   state.widths = [...mockGalleryWidths];
+
+  beforeEach(() => {
+    state.width = 1000;
+    state.position = 700;
+  });
 
   it('should find some values', () => {
     const visible = findVisibleItems(state);
     // console.log(visible);
     expect(visible.length > 1).toBe(true);
+  });
+
+  it('should find different values based on scroll position', () => {
+    const initialVisible = findVisibleItems(state);
+
+    expect(initialVisible.length > 1).toBe(true);
+
+    state.position = 2100;
+
+    const nextVisible = findVisibleItems(state);
+
+    expect(nextVisible.length > 1).toBe(true);
+
+    expect(initialVisible).not.toStrictEqual(nextVisible);
+  });
+
+  it('should find the same values as a linear search', () => {
+    const isVisible = galleryState.isFullyVisible;
+    const visible = findVisibleItems(state);
+    const linearFound = [];
+
+    const limits = galleryState.getVisibleWindow(state);
+
+    state.offsets.forEach((offset, i) => {
+      const width = state.widths[i];
+      if (isVisible(limits, [offset, offset + width, width])) {
+        linearFound.push(i);
+      }
+    });
+
+    // console.log('📈 linear validity check:', limits, visible, linearFound);
+
+    expect(visible).toStrictEqual(linearFound);
+  });
+
+  it('will still find values on small screens', () => {
+    // based on the mock data this should be a tricky width and position
+    // and will likely only leave one partially visible item
+    state.width = 320;
+    state.position = 1100;
+
+    const visible = findVisibleItems(state);
+
+    expect(visible.length).toBe(1);
+  });
+
+  it('will find the expected value on small screens', () => {
+    state.width = 320;
+    state.position = 1100;
+    const limits = galleryState.getVisibleWindow(state);
+
+    // find the expected position first
+    const {
+      isFullyVisible,
+      isPartiallyVisibleLeft,
+      isPartiallyVisibleRight,
+    } = galleryState;
+    const {
+      offsets,
+      widths,
+    } = state;
+
+    let found = null;
+    let i = 0;
+    while (i < offsets.length) {
+      let bounds: Boundary = [offsets[i], offsets[i] + widths[i], widths[i]];
+
+      if (
+        isFullyVisible(limits, bounds) ||
+        isPartiallyVisibleLeft(limits, bounds) ||
+        isPartiallyVisibleRight(limits, bounds)
+      ) {
+        found = i;
+        break;
+      }
+
+      i = i + 1;
+    }
+
+    // test the actual function
+    const visible = findVisibleItems(state);
+
+    expect(visible[0]).toBe(found);
+
   });
 });
 
