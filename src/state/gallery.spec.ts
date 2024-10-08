@@ -3,7 +3,16 @@ import type { Boundary } from './gallery';
 
 // const { describe, test, expect } = jest;
 
+
 const mockGallerySpacing = 15;
+
+function createOffsets(widths: Array<number>, spacing: number) {
+  return widths.reduce((arr, width, i) => {
+    arr[i] = i === 0 ? 0 : arr[i - 1] + widths[i - 1] + spacing;
+    return arr;
+  }, [])
+}
+
 const mockGalleryWidths = [
   200,
   100,
@@ -24,10 +33,8 @@ const mockGalleryWidths = [
   200,
   300
 ];
-const mockGalleryOffsets = mockGalleryWidths.reduce((arr, width, i) => {
-  arr[i] = i === 0 ? 0 : arr[i - 1] + mockGalleryWidths[i - 1] + mockGallerySpacing;
-  return arr;
-}, []);
+
+const mockGalleryOffsets = createOffsets(mockGalleryWidths, mockGallerySpacing);
 
 // @ts-expect-error yes I know this doesn't match the profile
 global.fetch = jest.fn(() => Promise.resolve({
@@ -232,7 +239,52 @@ describe('🔎 binary search visibility algo', () => {
     const visible = findVisibleItems(state);
 
     expect(visible[0]).toBe(found);
+  });
 
+  describe('🪚 testing with irregular values', () => {
+    const mockWidths = [
+      180,
+      320,
+      180,
+      320,
+      180,
+      320,
+      180,
+      180,
+      361,
+      361,
+      361,
+      511,
+      320,
+      360,
+      361,
+      361,
+      361,
+      180,
+      361,
+      321,
+      320,
+    ];
+    const mockOffsets = createOffsets(mockWidths, mockGallerySpacing * 2);
+
+    const findVisibleItems = galleryState.findVisibleItems;
+    const state = galleryState.createNewState();
+    state.width = 1181;
+
+    state.loadPosition = 0;
+    state.offsets = [...mockOffsets];
+    state.widths = [...mockWidths];
+
+    it('will pass at given problem mid-point scroll positions', () => {
+      const checkPositions = [4157, 4158, 4159, 4160, 4161, 4162];
+
+      checkPositions.forEach(position => {
+        state.position = position;
+        let visible = findVisibleItems(state);
+        expect(visible.length).toBeGreaterThan(2);
+        // console.log('🪵 problem position first index: ', visible[0]);
+      });
+    });
   });
 });
 
