@@ -6,7 +6,7 @@ Horizontal scrolling content is common on mobile. "Sliders" are similarly a comm
 
 ### Why is this still a problem?
 
-Most paginated sliders need to know the exact width of all child content so that pages can be pre-measured. That usually menas uniform sizes, and disabling native scrolling so that the slider can't get into an "unknown" state.
+Most paginated sliders need to know the exact width of all child content so that pages can be pre-measured. That usually means uniform sizes, and disabling native scrolling so that the slider can't get into an "unknown" state.
 
 ### How does this solution solve for that problem?
 
