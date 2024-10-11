@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useGalleryStore } from '../../state';
-import { useShallow } from 'zustand/react/shallow'
+import { useShallow } from 'zustand/react/shallow';
 import { debounce } from '../../utils/debounce';
 import { log } from '../../utils/log';
 
@@ -16,13 +16,17 @@ type NavProps = {
 };
 
 export function GalleryNav({ direction, onPress }: NavProps) {
-  const canScroll = useGalleryStore(state => direction === 'left' ? state.canScrollLeft : state.canScrollRight);
+  const canScroll = useGalleryStore((state) =>
+    direction === 'left' ? state.canScrollLeft : state.canScrollRight
+  );
   const Icon = direction === 'left' ? ChevronLeft : ChevronRight;
 
   return (
     <span
       onClick={onPress}
-      className={`gallery-strip__nav gallery-strip__nav--${direction}${canScroll ? '' : ' is-disabled'}`}
+      className={`gallery-strip__nav gallery-strip__nav--${direction}${
+        canScroll ? '' : ' is-disabled'
+      }`}
     >
       <Icon />
     </span>
@@ -60,16 +64,18 @@ function Gallery() {
     setPosition,
     setWidth,
     setItem,
-  ] = useGalleryStore(useShallow(state => ([
-    state.items,
-    state.loadItems,
-    state.getVisibleItems,
-    state.updateNavigation,
-    state.setLoadPosition,
-    state.setPosition,
-    state.setWidth,
-    state.setItem
-  ])));
+  ] = useGalleryStore(
+    useShallow((state) => [
+      state.items,
+      state.loadItems,
+      state.getVisibleItems,
+      state.updateNavigation,
+      state.setLoadPosition,
+      state.setPosition,
+      state.setWidth,
+      state.setItem,
+    ])
+  );
 
   useEffect(() => {
     if (items.length < 1) {
@@ -93,17 +99,23 @@ function Gallery() {
     }, 100);
   }, [scroller.current]);
 
-  const onScroll = useCallback(debounce((e) => {
-    if (useGalleryStore.getState().loadPosition === null) {
-      setLoadPosition(scroller.current.scrollLeft);
-    }
-    setPosition(e.target.scrollLeft);
-    updateNavigation();
-  }, 64), [setPosition, updateNavigation]);
+  const onScroll = useCallback(
+    debounce((e) => {
+      if (useGalleryStore.getState().loadPosition === null) {
+        setLoadPosition(scroller.current.scrollLeft);
+      }
+      setPosition(e.target.scrollLeft);
+      updateNavigation();
+    }, 64),
+    [setPosition, updateNavigation]
+  );
 
-  const onImageLoad = useCallback((e, i) => {
-    setItem(e.target.offsetWidth, e.target.x, i);
-  }, [setItem]);
+  const onImageLoad = useCallback(
+    (e, i) => {
+      setItem(e.target.offsetWidth, e.target.x, i);
+    },
+    [setItem]
+  );
 
   const onNextPage = useCallback(() => {
     let visible = getVisibleItems();
@@ -113,7 +125,7 @@ function Gallery() {
     log('⏭️ Next Page Index: ', next);
 
     if (isNaN(next)) {
-      log('🐛 Page Selection Debug: ', visible, useGalleryStore.getState())
+      log('🐛 Page Selection Debug: ', visible, useGalleryStore.getState());
     }
 
     if (next && scroller.current) {
@@ -123,13 +135,13 @@ function Gallery() {
         node.scrollIntoView({
           block: 'nearest',
           inline: 'start',
-          behavior: 'smooth'
+          behavior: 'smooth',
         });
       } else {
         scroller.current.scroll({
           top: 0,
           left: useGalleryStore.getState().offsets[next],
-          behavior: 'smooth'
+          behavior: 'smooth',
         });
       }
     }
@@ -141,7 +153,7 @@ function Gallery() {
     log('⏮️ Prev Page Index: ', prev);
 
     if (isNaN(prev)) {
-      log('🐛 Page Selection Debug: ', visible, useGalleryStore.getState())
+      log('🐛 Page Selection Debug: ', visible, useGalleryStore.getState());
     }
 
     if (!isNaN(prev) && scroller.current) {
@@ -154,13 +166,13 @@ function Gallery() {
         node.scrollIntoView({
           block: 'nearest',
           inline: 'start',
-          behavior: 'smooth'
+          behavior: 'smooth',
         });
       } else {
         scroller.current.scroll({
           top: 0,
           left: Math.max(0, useGalleryStore.getState().offsets[prev]),
-          behavior: 'smooth'
+          behavior: 'smooth',
         });
       }
     }
@@ -186,5 +198,4 @@ function Gallery() {
   );
 }
 
-export default Gallery
-
+export default Gallery;

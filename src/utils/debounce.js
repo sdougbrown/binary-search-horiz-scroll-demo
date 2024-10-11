@@ -1,16 +1,15 @@
-    // debounce helper for scroll events etc
+// debounce helper for scroll events etc
 export function debounce(func, timeout) {
   var timer;
   if (!timeout) {
     timeout = 16;
   }
-  return function() {
+  return function () {
     var ctx = this;
     var args = arguments;
     clearTimeout(timer);
-    timer = setTimeout(function() {
+    timer = setTimeout(function () {
       func.apply(ctx, args);
     }, timeout);
   };
 }
-

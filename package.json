@@ -11,6 +11,12 @@
     "test": "jest",
     "test:types": "tsc --jsx react -noEmit -p ."
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true
+  },
   "dependencies": {
     "immer": "^10.1.1",
     "react": "^18.3.1",
@@ -28,13 +34,16 @@
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
-    "eslint": "^9.11.1",
+    "eslint": "^9.12.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.12",
     "globals": "^15.9.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "prettier": "^3.3.3",
     "sass": "^1.79.4",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",

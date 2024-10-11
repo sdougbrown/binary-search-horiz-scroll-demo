@@ -2,8 +2,7 @@
 const isDev = true; // import.meta.env.DEV;
 
 function noop() {
-    return;
-};
+  return;
+}
 
 export const log = isDev ? console.log : noop;
-

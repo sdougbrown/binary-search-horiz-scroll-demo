@@ -4,19 +4,19 @@
 @use './_vars.scss' as *;
 
 .app-content {
-    padding: $spacing-unit 0;
-    background: $background-color;
+  padding: $spacing-unit 0;
+  background: $background-color;
 }
 
 .app-content--alt {
-    padding: $spacing-unit 0;
-    background: $alt-background-color;
+  padding: $spacing-unit 0;
+  background: $alt-background-color;
 }
 
 .app-content__wrap {
-    @extend %wrapper;
+  @extend %wrapper;
 }
 
 .app-content__wrap--half {
-    max-width: math.div($content-width, 1.5);
+  max-width: math.div($content-width, 1.5);
 }

@@ -11,10 +11,7 @@ const GALLERY_OUTPUT = `${__dirname}/public/${OUTPUT_FILE}`;
 function processGallery({ inputSrc, itemPath, outputSrc }) {
   fs.readdir(inputSrc, async function (err, allFiles) {
     if (err) {
-      console.error(
-        `💥 Could not parse gallery folder...`,
-        err
-      );
+      console.error(`💥 Could not parse gallery folder...`, err);
       process.exit(1);
     }
 
@@ -78,4 +75,3 @@ try {
 } catch (e) {
   console.error('💥 The whole thing blew up!', e);
 }
-

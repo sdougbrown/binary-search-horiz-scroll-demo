@@ -71,38 +71,43 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
   getVisibleItems: () => {
     return findVisibleItems(get() as GalleryState);
   },
-  updateNavigation: () => set(produce(state => evaluateGalleryButtons(state as GalleryState))),
-  setLoadPosition: (position: number) => set(produce(
-    state => {
-      log('setting load position', position);
-      state.loadPosition = position;
-      state.offsets.forEach((offset, i) => {
-        if (isNaN(offset)) {
-          return;
-        }
-        state.offsets[i] = offset + position;
-      });
-    }
-  )),
-  setPosition: (position: number) => set(produce(
-    state => {
-      log('setting position', position);
-      state.position = position;
-    }
-  )),
-  setWidth: (width: number) => set(produce(state => {
-      log('setting width', width);
-      state.width = width;
-    }
-  )),
+  updateNavigation: () =>
+    set(produce((state) => evaluateGalleryButtons(state as GalleryState))),
+  setLoadPosition: (position: number) =>
+    set(
+      produce((state) => {
+        log('setting load position', position);
+        state.loadPosition = position;
+        state.offsets.forEach((offset, i) => {
+          if (isNaN(offset)) {
+            return;
+          }
+          state.offsets[i] = offset + position;
+        });
+      })
+    ),
+  setPosition: (position: number) =>
+    set(
+      produce((state) => {
+        log('setting position', position);
+        state.position = position;
+      })
+    ),
+  setWidth: (width: number) =>
+    set(
+      produce((state) => {
+        log('setting width', width);
+        state.width = width;
+      })
+    ),
   // the below setters are unique and kind of an anti-pattern.
   // intentionally modifying inline rather than doing a shallow clone
   // because it does not have an effect on render cycles etc and we don't
   // want it to! this will fire a lot on page load and through scrolling
   // we don't want those cycles to fire a re-render, but the underlying state
   // will effect the evaluations done above
-  setItem: (width: number, x: number, index: number) => set(
-    state => {
+  setItem: (width: number, x: number, index: number) =>
+    set((state) => {
       log('setting item', index, width, x);
 
       const { widths, offsets } = state;
@@ -110,12 +115,11 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
       widths[index] = width;
       offsets[index] = x + (state.loadPosition || 0);
 
-      return ({
+      return {
         offsets,
         widths,
-      });
-    }
-  ),
+      };
+    }),
 }));
 
 export const getState = useGalleryStore.getState;
@@ -150,20 +154,26 @@ export function evaluateGalleryButtons(state: GalleryState) {
 
 export function getVisibleWindow(state: GalleryState): Boundary {
   return [state.position, state.position + state.width, state.width];
-};
+}
 
 export function isFullyVisible(limits: Boundary, bounds: Boundary) {
   return limits[0] < bounds[0] && limits[1] > bounds[1];
 }
 
 export function isPartiallyVisibleLeft(limits: Boundary, bounds: Boundary) {
-  return Math.max(0, limits[0] - bounds[2]) < bounds[0] && (limits[1] > bounds[1] || limits[2] < bounds[2]);
+  return (
+    Math.max(0, limits[0] - bounds[2]) < bounds[0] &&
+    (limits[1] > bounds[1] || limits[2] < bounds[2])
+  );
 }
 
 export function isPartiallyVisibleRight(limits: Boundary, bounds: Boundary) {
   var maxWidth = limits[0] + limits[1];
 
-  return Math.min(limits[1] + bounds[2], maxWidth) > bounds[1] && (limits[0] < bounds[0] || limits[2] < bounds[2]);
+  return (
+    Math.min(limits[1] + bounds[2], maxWidth) > bounds[1] &&
+    (limits[0] < bounds[0] || limits[2] < bounds[2])
+  );
 }
 
 export function findVisibleItems(state: GalleryState) {
@@ -180,7 +190,11 @@ export function findVisibleItems(state: GalleryState) {
 
   while (start <= end) {
     let middle = Math.floor((start + end) / 2);
-    let bounds: Boundary = [offsets[middle], offsets[middle] + widths[middle], widths[middle]];
+    let bounds: Boundary = [
+      offsets[middle],
+      offsets[middle] + widths[middle],
+      widths[middle],
+    ];
 
     let isFull = isFullyVisible(limits, bounds);
     let isPartialLeft = !isFull && isPartiallyVisibleLeft(limits, bounds);
@@ -251,7 +265,13 @@ export function findVisibleItems(state: GalleryState) {
   return visible.sort((a, b) => {
     return a - b;
   });
-};
+}
+
+/*
+// for messing around to get my local IDE working
+function badFunc() {
+  return isFullyVisible([], []);
+}
+*/
 
 export default useGalleryStore;
-

@@ -10,7 +10,7 @@ Most paginated sliders need to know the exact width of all child content so that
 
 ### How does this solution solve for that problem?
 
-By registering the width and offset of all child elements, we can do "just in time" evaluation to determine what's actually on the screen *now*, and then jump to the next offscreen elements. Doing this effectively means making that evaluation *fast*, so we've implimented a binary search to find elements that fit within the boundary of the current viewport.
+By registering the width and offset of all child elements, we can do "just in time" evaluation to determine what's actually on the screen _now_, and then jump to the next offscreen elements. Doing this effectively means making that evaluation _fast_, so we've implimented a binary search to find elements that fit within the boundary of the current viewport.
 
 ### Bro, that sounds complicated
 
@@ -26,7 +26,6 @@ This demo just uses `vite`, so setup was quick and it should be likewise easy fo
 
 If you'd like to change the images available in the demo, you can place them in `public/gallery` and run `node ./bin/createGallery.js` which will rebuild `public/gallery.json`.
 
-*Important note:* filenames should follow a `<name>-<id>.<ext>` naming convention or the script will break 🙃 (I just wrote it for myself so it's brittle, be gentle hahaha).
+_Important note:_ filenames should follow a `<name>-<id>.<ext>` naming convention or the script will break 🙃 (I just wrote it for myself so it's brittle, be gentle hahaha).
 
 Hope this helps!
-

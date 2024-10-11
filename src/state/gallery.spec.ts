@@ -3,47 +3,35 @@ import type { Boundary } from './gallery';
 
 // const { describe, test, expect } = jest;
 
-
 const mockGallerySpacing = 15;
 
 function createOffsets(widths: Array<number>, spacing: number) {
   return widths.reduce((arr, width, i) => {
     arr[i] = i === 0 ? 0 : arr[i - 1] + widths[i - 1] + spacing;
     return arr;
-  }, [])
+  }, []);
 }
 
 const mockGalleryWidths = [
-  200,
-  100,
-  300,
-  250,
-  150,
-  400,
-  175,
-  200,
-  300,
-  300,
-  400,
-  250,
-  250,
-  150,
-  450,
-  500,
-  200,
-  300
+  200, 100, 300, 250, 150, 400, 175, 200, 300, 300, 400, 250, 250, 150, 450,
+  500, 200, 300,
 ];
 
 const mockGalleryOffsets = createOffsets(mockGalleryWidths, mockGallerySpacing);
 
 // @ts-expect-error yes I know this doesn't match the profile
-global.fetch = jest.fn(() => Promise.resolve({
-  json: () => Promise.resolve(mockGalleryWidths.map(w => ({
-    id: `${Math.floor(w * Math.random())}`,
-    src: `${w}.jpg`,
-    alt: `${w}`,
-  }))),
-}));
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () =>
+      Promise.resolve(
+        mockGalleryWidths.map((w) => ({
+          id: `${Math.floor(w * Math.random())}`,
+          src: `${w}.jpg`,
+          alt: `${w}`,
+        }))
+      ),
+  })
+);
 
 describe('📀 mock data validity', () => {
   it('has matching lengths', () => {
@@ -92,7 +80,7 @@ describe('👀 visibility helpers', () => {
     });
     it('should reject offscreen left', () => {
       expect(isVisible(limits, [100, 200, 100])).toBe(false);
-    })
+    });
     it('should reject offscreen right', () => {
       expect(isVisible(limits, [1000, 1100, 100])).toBe(false);
     });
@@ -112,7 +100,7 @@ describe('👀 visibility helpers', () => {
     });
     it('should reject offscreen left', () => {
       expect(isVisible(limits, [100, 200, 100])).toBe(false);
-    })
+    });
     it('should reject offscreen right', () => {
       expect(isVisible(limits, [1000, 1100, 100])).toBe(false);
     });
@@ -132,7 +120,7 @@ describe('👀 visibility helpers', () => {
     });
     it('should reject offscreen left', () => {
       expect(isVisible(limits, [100, 200, 100])).toBe(false);
-    })
+    });
     it('should reject offscreen right', () => {
       expect(isVisible(limits, [1000, 1100, 100])).toBe(false);
     });
@@ -208,15 +196,9 @@ describe('🔎 binary search visibility algo', () => {
     const limits = galleryState.getVisibleWindow(state);
 
     // find the expected position first
-    const {
-      isFullyVisible,
-      isPartiallyVisibleLeft,
-      isPartiallyVisibleRight,
-    } = galleryState;
-    const {
-      offsets,
-      widths,
-    } = state;
+    const { isFullyVisible, isPartiallyVisibleLeft, isPartiallyVisibleRight } =
+      galleryState;
+    const { offsets, widths } = state;
 
     let found = null;
     let i = 0;
@@ -243,27 +225,8 @@ describe('🔎 binary search visibility algo', () => {
 
   describe('🪚 testing with irregular values', () => {
     const mockWidths = [
-      180,
-      320,
-      180,
-      320,
-      180,
-      320,
-      180,
-      180,
-      361,
-      361,
-      361,
-      511,
-      320,
-      360,
-      361,
-      361,
-      361,
-      180,
-      361,
-      321,
-      320,
+      180, 320, 180, 320, 180, 320, 180, 180, 361, 361, 361, 511, 320, 360, 361,
+      361, 361, 180, 361, 321, 320,
     ];
     const mockOffsets = createOffsets(mockWidths, mockGallerySpacing * 2);
 
@@ -278,7 +241,7 @@ describe('🔎 binary search visibility algo', () => {
     it('will pass at given problem mid-point scroll positions', () => {
       const checkPositions = [4157, 4158, 4159, 4160, 4161, 4162];
 
-      checkPositions.forEach(position => {
+      checkPositions.forEach((position) => {
         state.position = position;
         let visible = findVisibleItems(state);
         expect(visible.length).toBeGreaterThan(2);
@@ -311,5 +274,4 @@ describe('🦴 fetching external json data', () => {
     expect(newState.items.length).toEqual(newState.widths.length);
     expect(newState.items.length).toEqual(newState.offsets.length);
   });
-
 });

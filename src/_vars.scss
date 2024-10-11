@@ -2,41 +2,39 @@
 
 @charset "utf-8";
 
-$green: #84C618;
-$red: #FF2929;
-$yellow: #FFFF00;
-$orange: #EF7300;
+$green: #84c618;
+$red: #ff2929;
+$yellow: #ffff00;
+$orange: #ef7300;
 
 // Our variables
-$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$base-font-size:   16px;
+$base-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$base-font-size: 16px;
 $base-font-weight: 400;
-$small-font-size:  $base-font-size * 0.75;
+$small-font-size: $base-font-size * 0.75;
 $base-line-height: 1.45;
 $header-font-family: 'Wire One', Impact, sans-serif;
 $header-line-height: 1.2;
 
-$spacing-unit:     30px;
-$spacing-half:     math.div($spacing-unit, 2);
-$spacing-quart:    math.div($spacing-unit, 4);
+$spacing-unit: 30px;
+$spacing-half: math.div($spacing-unit, 2);
+$spacing-quart: math.div($spacing-unit, 4);
 
-$text-color:       #111;
+$text-color: #111;
 $background-color: #fdfdfd;
 $alt-background-color: #ededed;
-$brand-color:      $green;
+$brand-color: $green;
 
-$grey-color:       #828282;
+$grey-color: #828282;
 $grey-color-light: adjust-color($grey-color, $lightness: 40%);
-$grey-color-dark:  adjust-color($grey-color, $lightness: -25%);
+$grey-color-dark: adjust-color($grey-color, $lightness: -25%);
 
 // Width of the content area
-$content-width:    1100px;
+$content-width: 1100px;
 
-$on-palm:          600px;
-$on-laptop:        900px;
-$on-desk:          1100px;
-
-
+$on-palm: 600px;
+$on-laptop: 900px;
+$on-desk: 1100px;
 
 // Use media queries like this:
 // @include media-query($on-palm) {
@@ -46,53 +44,76 @@ $on-desk:          1100px;
 //     }
 // }
 @mixin media-query($device) {
-    @media screen and (max-width: $device) {
-        @content;
-    }
+  @media screen and (max-width: $device) {
+    @content;
+  }
 }
-
 
 /**
  * Clearfix
  */
 %clearfix {
-    &:after {
-        content: "";
-        display: table;
-        clear: both;
-    }
+  &:after {
+    content: '';
+    display: table;
+    clear: both;
+  }
 }
-
 
 /**
  * Gradient
  */
 %gradient {
-    background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.5)));
-    background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 100%);
-    background: -o-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 100%);
-    background: -ms-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 100%);
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 100%);
+  background: -moz-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  background: -webkit-gradient(
+    linear,
+    left top,
+    left bottom,
+    color-stop(0%, rgba(0, 0, 0, 0)),
+    color-stop(100%, rgba(0, 0, 0, 0.5))
+  );
+  background: -webkit-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  background: -o-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  background: -ms-linear-gradient(
+    top,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
 }
-
 
 /**
  * Wrapper
  */
 %wrapper {
-    @extend %clearfix;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    margin-right: auto;
-    margin-left: auto;
-    padding-right: $spacing-unit;
-    padding-left: $spacing-unit;
-    max-width: $content-width;
+  @extend %clearfix;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: $spacing-unit;
+  padding-left: $spacing-unit;
+  max-width: $content-width;
 
-    @include media-query($on-laptop) {
-        padding-right: math.div($spacing-unit, 2);
-        padding-left: math.div($spacing-unit, 2);
-    }
+  @include media-query($on-laptop) {
+    padding-right: math.div($spacing-unit, 2);
+    padding-left: math.div($spacing-unit, 2);
+  }
 }
