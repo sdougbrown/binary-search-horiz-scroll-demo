@@ -78,7 +78,7 @@ export const useGalleryStore = create<GalleryStore>((set, get) => ({
       produce((state) => {
         log('setting load position', position);
         state.loadPosition = position;
-        state.offsets.forEach((offset, i) => {
+        state.offsets.forEach((offset: number, i: number) => {
           if (isNaN(offset)) {
             return;
           }
@@ -168,7 +168,7 @@ export function isPartiallyVisibleLeft(limits: Boundary, bounds: Boundary) {
 }
 
 export function isPartiallyVisibleRight(limits: Boundary, bounds: Boundary) {
-  var maxWidth = limits[0] + limits[1];
+  let maxWidth = limits[0] + limits[1];
 
   return (
     Math.min(limits[1] + bounds[2], maxWidth) > bounds[1] &&
@@ -185,8 +185,6 @@ export function findVisibleItems(state: GalleryState) {
 
   let start = 0;
   let end = offsets.length - 1;
-
-  let maxWidth = limits[0] + limits[1];
 
   while (start <= end) {
     let middle = Math.floor((start + end) / 2);
@@ -266,12 +264,5 @@ export function findVisibleItems(state: GalleryState) {
     return a - b;
   });
 }
-
-/*
-// for messing around to get my local IDE working
-function badFunc() {
-  return isFullyVisible([], []);
-}
-*/
 
 export default useGalleryStore;
