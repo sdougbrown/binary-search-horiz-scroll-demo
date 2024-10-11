@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useGalleryStore } from '../../state';
 import { useShallow } from 'zustand/react/shallow';
+// @ts-expect-error - i don't want to write a description file right now ok, maybe i'll convert it to ts later
 import { debounce } from '../../utils/debounce';
 import { log } from '../../utils/log';
 
+// @ts-expect-error - i don't want to write a description file right now ok, maybe i'll convert it to ts later
 import { ChevronLeft, ChevronRight } from '../../icons/chevrons';
 
 import type { GalleryItem } from '../../state/gallery';
+import type { SyntheticEvent } from 'react';
 
 import './style.scss';
 
@@ -36,7 +39,7 @@ export function GalleryNav({ direction, onPress }: NavProps) {
 type ItemProps = {
   index: number;
   item: GalleryItem;
-  onImageLoad: (e, i: number) => void;
+  onImageLoad: (e: SyntheticEvent, i: number) => void;
 };
 
 export function GalleryItem(props: ItemProps) {
@@ -82,7 +85,7 @@ function Gallery() {
       log('loading gallery', items);
       loadItems();
     }
-  }, [items]);
+  }, [items, loadItems]);
 
   useEffect(() => {
     if (!scroller.current) {
@@ -97,21 +100,22 @@ function Gallery() {
         setLoadPosition(scroller.current.scrollLeft);
       }
     }, 100);
-  }, [scroller.current]);
+  }, [setWidth, setPosition, setLoadPosition]);
 
   const onScroll = useCallback(
-    debounce((e) => {
-      if (useGalleryStore.getState().loadPosition === null) {
-        setLoadPosition(scroller.current.scrollLeft);
-      }
-      setPosition(e.target.scrollLeft);
-      updateNavigation();
-    }, 64),
-    [setPosition, updateNavigation]
+    () =>
+      debounce((e: SyntheticEvent) => {
+        if (useGalleryStore.getState().loadPosition === null) {
+          setLoadPosition(scroller.current.scrollLeft);
+        }
+        setPosition(e.target.scrollLeft);
+        updateNavigation();
+      }, 64)(),
+    [setPosition, setLoadPosition, updateNavigation]
   );
 
   const onImageLoad = useCallback(
-    (e, i) => {
+    (e: SyntheticEvent, i: number) => {
       setItem(e.target.offsetWidth, e.target.x, i);
     },
     [setItem]
@@ -145,11 +149,11 @@ function Gallery() {
         });
       }
     }
-  }, [scroller.current]);
+  }, [getVisibleItems, items.length]);
 
   const onPrevPage = useCallback(() => {
-    var visible = getVisibleItems();
-    var prev = Math.max(0, visible[0] - 1);
+    let visible = getVisibleItems();
+    let prev = Math.max(0, visible[0] - 1);
     log('⏮️ Prev Page Index: ', prev);
 
     if (isNaN(prev)) {
@@ -176,7 +180,7 @@ function Gallery() {
         });
       }
     }
-  }, [scroller.current]);
+  }, [getVisibleItems]);
 
   return (
     <div className="gallery-wrapper">
